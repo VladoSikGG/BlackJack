@@ -7,6 +7,6 @@ public class ButtonPlay : MonoBehaviour
 {
     public void StartGame()
     {
-        SceneManager.LoadScene($"Level{PlayerPrefs.GetInt("Level")}");
+        SceneManager.LoadScene("Game");
     }
 }

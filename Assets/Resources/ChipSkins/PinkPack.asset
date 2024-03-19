@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40c59fd54207043ebb3fa1a20a330f58, type: 3}
   m_Name: PinkPack
   m_EditorClassIdentifier: 
-  chip1: {fileID: 21300000, guid: 8b8c8967807994ed39841e93dd056bf6, type: 3}
-  chip5: {fileID: 21300000, guid: 04b18d5dc0c7344dca2a27dfcb3051ae, type: 3}
-  chip10: {fileID: 21300000, guid: 1d9ed61b3c170476baa5d3b9fc3178e4, type: 3}
-  chip25: {fileID: 21300000, guid: 756354475a3894e5798c6dee2a5a630f, type: 3}
-  chip100: {fileID: 21300000, guid: 507270a1c254d413d8bccd63c651b6dc, type: 3}
+  chips:
+  - {fileID: 21300000, guid: 8b8c8967807994ed39841e93dd056bf6, type: 3}
+  - {fileID: 21300000, guid: 04b18d5dc0c7344dca2a27dfcb3051ae, type: 3}
+  - {fileID: 21300000, guid: 1d9ed61b3c170476baa5d3b9fc3178e4, type: 3}
+  - {fileID: 21300000, guid: 756354475a3894e5798c6dee2a5a630f, type: 3}
+  - {fileID: 21300000, guid: 507270a1c254d413d8bccd63c651b6dc, type: 3}

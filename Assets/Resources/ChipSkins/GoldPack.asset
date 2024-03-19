@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40c59fd54207043ebb3fa1a20a330f58, type: 3}
   m_Name: GoldPack
   m_EditorClassIdentifier: 
-  chip1: {fileID: 21300000, guid: 5b268773b2008483a99b93c7caf9ff5b, type: 3}
-  chip5: {fileID: 21300000, guid: 430591e1bcbbd400c9e75a2ab6b99214, type: 3}
-  chip10: {fileID: 21300000, guid: ac1b3370551234a88af119963940bd72, type: 3}
-  chip25: {fileID: 21300000, guid: 3923ac04065f44a728cb7e707c2666e6, type: 3}
-  chip100: {fileID: 21300000, guid: ede7fa90eff944897bf1f343e6e5876b, type: 3}
+  chips:
+  - {fileID: 21300000, guid: 5b268773b2008483a99b93c7caf9ff5b, type: 3}
+  - {fileID: 21300000, guid: 430591e1bcbbd400c9e75a2ab6b99214, type: 3}
+  - {fileID: 21300000, guid: ac1b3370551234a88af119963940bd72, type: 3}
+  - {fileID: 21300000, guid: 3923ac04065f44a728cb7e707c2666e6, type: 3}
+  - {fileID: 21300000, guid: ede7fa90eff944897bf1f343e6e5876b, type: 3}

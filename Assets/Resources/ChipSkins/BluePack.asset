@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40c59fd54207043ebb3fa1a20a330f58, type: 3}
   m_Name: BluePack
   m_EditorClassIdentifier: 
-  chip1: {fileID: 21300000, guid: 46dcd3bed8862441395ec0a2b0e6e65f, type: 3}
-  chip5: {fileID: 21300000, guid: cf7746c7af3d04fcc96d83a35c445d7b, type: 3}
-  chip10: {fileID: 21300000, guid: 61fafcb87f41349b4bdbd364991be2ad, type: 3}
-  chip25: {fileID: 21300000, guid: 13dda14fa815f493ea52dfb8aba11565, type: 3}
-  chip100: {fileID: 21300000, guid: af172e0620c4a4ae99b13ee30ea05678, type: 3}
+  chips:
+  - {fileID: 21300000, guid: 46dcd3bed8862441395ec0a2b0e6e65f, type: 3}
+  - {fileID: 21300000, guid: cf7746c7af3d04fcc96d83a35c445d7b, type: 3}
+  - {fileID: 21300000, guid: 61fafcb87f41349b4bdbd364991be2ad, type: 3}
+  - {fileID: 21300000, guid: 13dda14fa815f493ea52dfb8aba11565, type: 3}
+  - {fileID: 21300000, guid: af172e0620c4a4ae99b13ee30ea05678, type: 3}
