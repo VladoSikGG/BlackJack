@@ -19,7 +19,7 @@ public class GameActions : MonoBehaviour
     [SerializeField] private Transform _botHand, _playerHand;
     [SerializeField] private List<int> _playedCards;
 
-    [SerializeField] private TMP_Text _textBet, _textResult;
+    [SerializeField] private TMP_Text _textBet, _textResult, _txtPlayerScore, _txtBotScore;
 
     [SerializeField] private int _playerScore, _botScore;
 
@@ -29,6 +29,9 @@ public class GameActions : MonoBehaviour
 
     [SerializeField] private SkinInfo[] _allSkins;
     private SkinInfo _currentSkin;
+
+    [SerializeField] private List<GameObject> _acesBot, _acesPlayer;
+    private bool _gotJoker = false, _canTake = false;
 
     public SkinInfo GetSkin()
     {
@@ -49,6 +52,8 @@ public class GameActions : MonoBehaviour
     private void Update()
     {
         _textBet.text = $"BET: {PlayerPrefs.GetInt("Bet")}C";
+        _txtPlayerScore.text = _playerScore.ToString();
+        _txtBotScore.text = _botScore.ToString();
     }
 
     private void WinGame()
@@ -63,7 +68,7 @@ public class GameActions : MonoBehaviour
         _botBet.transform.DOMove(_playerHand.position, 1f);
         _objResult.transform.DOLocalMoveY(0, 3f).OnStepComplete(() =>
         {
-            _objResult.transform.DOLocalMoveY(-1300, 3).OnStepComplete(() => _firstPanel.SetActive(true));
+            _objResult.transform.DOLocalMoveY(-2500, 1).OnStepComplete(() => _firstPanel.SetActive(true));
             _bet.transform.position = _playerHand.transform.position;
             _botBet.transform.position = _botHand.transform.position;
         });
@@ -71,7 +76,6 @@ public class GameActions : MonoBehaviour
 
     private void Draw()
     {
-        PlayerPrefs.SetInt("Money", PlayerPrefs.GetInt("Money") + PlayerPrefs.GetInt("Bet"));
         PlayerPrefs.SetInt("Bet", 1);
 
         NextGame();
@@ -81,7 +85,7 @@ public class GameActions : MonoBehaviour
         _botBet.transform.DOMove(_botHand.position, 1f);
         _objResult.transform.DOLocalMoveY(0, 3f).OnStepComplete(()=>
         {
-            _objResult.transform.DOLocalMoveY(-1300, 3).OnStepComplete(() =>_firstPanel.SetActive(true));
+            _objResult.transform.DOLocalMoveY(-2500, 1).OnStepComplete(() =>_firstPanel.SetActive(true));
             _bet.transform.position = _playerHand.transform.position;
             _botBet.transform.position = _botHand.transform.position;
         });;
@@ -98,7 +102,7 @@ public class GameActions : MonoBehaviour
         _botBet.transform.DOMove(_botHand.position, 1f);
         _objResult.transform.DOLocalMoveY(0, 3f).OnStepComplete(()=>
         {
-            _objResult.transform.DOLocalMoveY(-1300, 3).OnStepComplete(() =>_firstPanel.SetActive(true));
+            _objResult.transform.DOLocalMoveY(-2500, 1).OnStepComplete(() =>_firstPanel.SetActive(true));
             _bet.transform.position = _playerHand.transform.position;
             _botBet.transform.position = _botHand.transform.position;
         });
@@ -108,7 +112,8 @@ public class GameActions : MonoBehaviour
     private void CheckStatus()
     {
         if (_botScore > 21 && _playerScore <= 21) WinGame();
-        else if (_botScore == 21 && _playerScore == 21) Draw();
+        else if (_botScore >= 21 && _playerScore >= 21) Draw();
+        else if (_botScore == _playerScore) Draw();
         else if (_botScore < _playerScore && _playerScore <= 21) WinGame();
         else GameOver();
     }
@@ -126,7 +131,10 @@ public class GameActions : MonoBehaviour
         _playerScore = 0;
         _firstPanel.SetActive(false);
         _secondPanel.SetActive(false);
-        
+        _acesBot.Clear();
+        _acesPlayer.Clear();
+        _gotJoker = false;
+        _canTake = false;
     }
     public void HangOut()
     {
@@ -139,21 +147,28 @@ public class GameActions : MonoBehaviour
             {
                 _giveCard.transform.localPosition = startPosCard;
                 InitializePlayerCard();
-                _giveCard.transform.DOMove(_botHand.position, 0.5f).OnStepComplete(() =>
+                if (!_gotJoker)
                 {
-                    _giveCard.transform.localPosition = startPosCard;
-                    InitializeBotCard();
-                    _giveCard.transform.DOMove(_playerHand.position, 0.5f).OnStepComplete(() =>
+                    _giveCard.transform.DOMove(_botHand.position, 0.5f).OnStepComplete(() =>
                     {
                         _giveCard.transform.localPosition = startPosCard;
-                        InitializePlayerCard();
-                        _giveCard.transform.DOMove(_botHand.position, 0.5f).OnStepComplete(() =>
+                        InitializeBotCard();
+                        _giveCard.transform.DOMove(_playerHand.position, 0.5f).OnStepComplete(() =>
                         {
-                            InitializeBotCardEmpty();
                             _giveCard.transform.localPosition = startPosCard;
+                            InitializePlayerCard();
+                            if (!_gotJoker)
+                            {
+                                _giveCard.transform.DOMove(_botHand.position, 0.5f).OnStepComplete(() =>
+                                {
+                                    InitializeBotCardEmpty();
+                                    _giveCard.transform.localPosition = startPosCard;
+                                    _canTake = true;
+                                });
+                            }
                         });
                     });
-                });
+                }
             });
             _firstPanel.SetActive(false);
             _secondPanel.SetActive(true);
@@ -162,12 +177,15 @@ public class GameActions : MonoBehaviour
 
     private void GivePlayerCard()
     {
+        _canTake = false;
         Vector3 startPosCard = _giveCard.transform.localPosition;
         _giveCard.transform.DOMove(_playerHand.position, 0.5f).OnStepComplete(() =>
             {
                 InitializePlayerCard();
                 _giveCard.transform.localPosition = startPosCard;
+                _canTake = true;
             });
+        
     }
 
     private void GiveBotCard()
@@ -198,10 +216,14 @@ public class GameActions : MonoBehaviour
         }
         if (GO.GetComponent<Card>().GetValue() == 21)
         {
-            WinGame();
+            StartCoroutine(GetJoker());
+            _gotJoker = true;
             return;
         }
-        _playerScore += GO.GetComponent<Card>().GetValue();
+
+        if (GO.GetComponent<Card>().GetValue() == 0) _acesPlayer.Add(GO);
+        _playerScore = 0;
+        CalculatePlayerScore();
         if (_playerScore > 21) Pass();
     }
     private void InitializeBotCardEmpty()
@@ -235,7 +257,57 @@ public class GameActions : MonoBehaviour
             }
             
         }
-        _botScore += GO.GetComponent<Card>().GetValue();
+        if (GO.GetComponent<Card>().GetValue() == 0) _acesBot.Add(GO);
+        _botScore = 0;
+        CalculateBotScore();
+        
+    }
+
+    private void CalculatePlayerScore()
+    {
+        for (int i = 0; i < _playerHand.childCount; i++)
+        {
+            _playerScore += _playerHand.GetChild(i).GetComponent<Card>().GetValue();
+        }
+
+        if (_acesPlayer.Count > 0)
+        {
+            for (int i = 0; i < _acesPlayer.Count; i++)
+            {
+                if (11 + _playerScore > 21)
+                {
+                    _playerScore++;
+                }
+                else
+                {
+                    _playerScore += 11;
+                }
+            }
+        }
+        
+    }
+    
+    private void CalculateBotScore()
+    {
+        for (int i = 0; i < _botHand.childCount; i++)
+        {
+            _botScore += _botHand.GetChild(i).GetComponent<Card>().GetValue();
+        }
+
+        if (_acesBot.Count > 0)
+        {
+            for (int i = 0; i < _acesBot.Count; i++)
+            {
+                if (11 + _botScore > 21)
+                {
+                    _botScore++;
+                }
+                else
+                {
+                    _botScore += 11;
+                }
+            }
+        }
         
     }
 
@@ -278,20 +350,33 @@ public class GameActions : MonoBehaviour
 
     public void Pass()
     {
-        StartCoroutine(PauseWait());
+        if (_canTake)
+        {
+            _canTake = false;
+            StartCoroutine(PauseWait());
+        }
     }
     public void AnotherCard()
     {
-        GivePlayerCard();
+        if (_canTake) 
+            GivePlayerCard();
     }
 
     public void DoubleIt()
     {
-        if (PlayerPrefs.GetInt("Money") >= PlayerPrefs.GetInt("Bet")*2) SetBet(PlayerPrefs.GetInt("Bet"));
-        else PlayerPrefs.SetInt("Bet", PlayerPrefs.GetInt("Money"));
-        //PlayerPrefs.SetInt("Money", PlayerPrefs.GetInt("Money") - PlayerPrefs.GetInt("Bet")/2);
-        GivePlayerCard();
-        Pass();
+        if (_canTake)
+        {
+            _canTake = false;
+            Vector3 startPosCard = _giveCard.transform.localPosition;
+            _giveCard.transform.DOMove(_playerHand.position, 0.5f).OnStepComplete(() =>
+            {
+                InitializePlayerCard();
+                _giveCard.transform.localPosition = startPosCard;
+            });
+            if (PlayerPrefs.GetInt("Money") >= PlayerPrefs.GetInt("Bet") * 2) SetBet(PlayerPrefs.GetInt("Bet"));
+            else PlayerPrefs.SetInt("Bet", PlayerPrefs.GetInt("Money"));
+            StartCoroutine(PauseWait());
+        }
     }
 
     private IEnumerator PauseWait()
@@ -302,7 +387,7 @@ public class GameActions : MonoBehaviour
             _botScore += _botHand.GetChild(1).gameObject.GetComponent<Card>().GetValue();
         }
         yield return new WaitForSeconds(1.5f);
-        for (int i = 0; i < Random.Range(0,3); i++)
+        while (_botScore < 17)
         {
             if (_botScore < 17)
                 GiveBotCard();
@@ -312,6 +397,12 @@ public class GameActions : MonoBehaviour
         }
         yield return new WaitForSeconds(3f);
         CheckStatus();
+    }
+    
+    private IEnumerator GetJoker()
+    {
+        yield return new WaitForSeconds(1.5f);
+        WinGame();
     }
 
     public void Restart()

@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b09e05730e61d4aac80ffbd72766b90b, type: 3}
   m_Name: Ace
   m_EditorClassIdentifier: 
-  value: 1
+  value: 0
   viewSprite: {fileID: 21300000, guid: cd2f26f05fc6a4e788ddec758a97ab3b, type: 3}
